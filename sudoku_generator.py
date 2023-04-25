@@ -1,4 +1,5 @@
-import math,random
+import math, random
+from sudoku import Cell
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -6,7 +7,9 @@ https://www.geeksforgeeks.org/program-sudoku-generator/
 
 """
 
+
 class SudokuGenerator:
+
     '''
 	create a sudoku board - initialize class variables and set up the 2D board
 	This should initialize:
@@ -22,8 +25,12 @@ class SudokuGenerator:
 	Return:
 	None
     '''
+
     def __init__(self, row_length, removed_cells):
-        pass
+        self.row_length = row_length
+        self.removed_cells = removed_cells
+        self.box_length = math.sqrt(row_length)
+        self.board = self.get_board()
 
     '''
 	Returns a 2D python list of numbers which represents the board
@@ -32,7 +39,9 @@ class SudokuGenerator:
 	Return: list[list]
     '''
     def get_board(self):
-        pass
+        # this is a placeholder list of lists
+        board = [[],[],[]]
+        return board
 
     '''
 	Displays the board to the console
@@ -108,8 +117,17 @@ class SudokuGenerator:
 
 	Return: None
     '''
+
     def fill_box(self, row_start, col_start):
-        pass
+        unused_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        i = row_start
+        while i <= row_start+2:
+            j = col_start
+            while j <= col_start+2:
+                num_to_add = unused_numbers.pop(random.randint(0,len(unused_numbers)))
+                self.board[i][j] = num_to_add
+                j += 1
+            i += 1
     
     '''
     Fills the three boxes along the main diagonal of the board
@@ -119,7 +137,9 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_diagonal(self):
-        pass
+        self.fill_box(0, 0)
+        self.fill_box(3, 3)
+        self.fill_box(6, 6)
 
     '''
     DO NOT CHANGE
