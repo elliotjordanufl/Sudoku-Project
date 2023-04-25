@@ -245,7 +245,13 @@ class SudokuGenerator:
     '''
 
     def remove_cells(self):
-        pass
+        while self.removed_cells > 0:
+            rand_col = random.randint(0, self.row_length-1)
+            rand_row = random.randint(0, self.row_length-1)
+            cell_to_remove = self.board[rand_col][rand_row]
+            if cell_to_remove != 0:
+                self.board[rand_col][rand_row] = 0
+                self.removed_cells -= 1
 
 
 '''
@@ -278,11 +284,21 @@ pygame.init()
 def intro_screen():
     text = myfont.render('Welcome to Sudoku', True, black)
     text1 = myfont1.render('Select Game Mode:', True, black)
+    text_option1 = myfont2.render('Easy', True, black)
+    text_option2 = myfont2.render('Medium', True, black)
+    text_option3 = myfont2.render('Hard', True, black)
+
+
     screen.fill(black)
     screen.blit(background, (0, 0))
     screen.blit(text, (123.5, 60))
     screen.blit(text1, (197.5, 200))
-    pygame.draw.polygon(screen, yellow, [(0, 500), (0, 700), (1000, 700), (1000, 500)])
+    screen.blit(text_option1, (200, 400))
+    screen.blit(text_option2, (355, 400))
+    screen.blit(text_option3, (500, 400))
+
+
+
 
 size = width, height = 800, 533
 black = 0, 0, 0
@@ -298,7 +314,7 @@ myfont = pygame.font.SysFont('Comic Sans', 60)
 myfont1 = pygame.font.SysFont('Comic Sans', 45)
 myfont2 = pygame.font.SysFont('Comic Sans', 20)
 
-print(myfont1.size('Select Game Mode:'))
+print(myfont2.size('Medium'))
 
 while True:
     for event in pygame.event.get():
