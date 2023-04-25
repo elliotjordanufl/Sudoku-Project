@@ -1,4 +1,5 @@
 import math, random
+import sys, pygame
 from sudoku import Cell, Board
 
 

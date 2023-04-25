@@ -1,3 +1,5 @@
+import sys, pygame
+
 class Cell:
     def __int__(self, value, row, col, screen):
         self.value = value
