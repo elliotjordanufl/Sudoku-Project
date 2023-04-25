@@ -1,5 +1,6 @@
 import math, random
-from sudoku import Cell
+from sudoku import Cell, Board
+
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -286,5 +287,6 @@ board = sudoku.get_board()
 sudoku.remove_cells()
 sudoku.print_board()
 '''
-
-generate_sudoku(9,70)
+this_sudoku = generate_sudoku(9,70)
+# screen and difficulty
+# this_board = Board(9,9,screen,difficulty)
