@@ -1,5 +1,6 @@
 import math, random
-from sudoku import Cell
+import sys, pygame
+from sudoku import Cell,Board
 
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
@@ -272,6 +273,37 @@ def generate_sudoku(size, removed):
     #board = sudoku.get_board()
     return board
 
-sudoku = SudokuGenerator(9, 0)
-sudoku.fill_values()
-sudoku.print_board()
+pygame.init()
+
+def intro_screen():
+    text = myfont.render('Welcome to Sudoku', True, black)
+    text1 = myfont1.render('Select Game Mode:', True, black)
+    screen.fill(black)
+    screen.blit(background, (0, 0))
+    screen.blit(text, (123.5, 60))
+    screen.blit(text1, (197.5, 200))
+    pygame.draw.polygon(screen, yellow, [(0, 500), (0, 700), (1000, 700), (1000, 500)])
+
+size = width, height = 800, 533
+black = 0, 0, 0
+white = 255, 255, 255
+yellow = 250, 221, 2
+
+
+screen = pygame.display.set_mode(size)
+
+background = pygame.image.load("sudoku-background.jpg")
+
+myfont = pygame.font.SysFont('Comic Sans', 60)
+myfont1 = pygame.font.SysFont('Comic Sans', 45)
+myfont2 = pygame.font.SysFont('Comic Sans', 20)
+
+print(myfont1.size('Select Game Mode:'))
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
+    intro_screen()
+
+
+    pygame.display.flip()
