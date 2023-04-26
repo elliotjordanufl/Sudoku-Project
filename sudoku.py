@@ -1,21 +1,29 @@
 import random
+
 class Cell:
 
-    def __int__(self, value, row, col, screen):
+    def __init__(self, value, row, col, screen):
         self.value = value
         self.row = row
         self.col = col
         self.screen = screen
-        self.is_editable = False
+        self.is_editable = True
+        self.is_Selected = False
+        self.sketched_value = 0
 
     def set_cell_value(self, value):
         self.value = value
+        print(f"Cell value set to {self.value}")
 
     def set_sketched_value(self, value):
         self.sketched_value = value
 
     def draw(self):
-        pass
+        # for debugging
+        if self.is_Selected:
+            print(f"You clicked {self.row, self.col}")
+        if self.is_editable:
+            print("Fuck Yeah!!")
 
 class Board:
 
@@ -26,13 +34,14 @@ class Board:
         self.difficulty = difficulty
         self.cells = {}
         self.selected_cell = None
+        self.first_Selection = True
 
-    def set_up_cells(self, sudoku):
+    def set_up_cells(self, generated_sudoku):
         i = 0
         while i < self.width:
             j = 0
             while j < self.height:
-                self.cells[i,j] = Cell(sudoku[i][j], j, i, self.screen)
+                self.cells[i, j] = Cell(generated_sudoku.board[j][i], j, i, self.screen)
                 # i do not know why this is an error / warning?
                 # i want to get it so that the tuple key for this dictionary is the same as the cell's row and col
                 j +=1
@@ -43,29 +52,32 @@ class Board:
             cell.draw()
 
     def select(self, row, col):
-        previous_cell = self.selected_cell
-        previous_cell.is_Selected = False
+        if not self.first_Selection:
+            previous_cell = self.selected_cell
+            previous_cell.is_Selected = False
         self.selected_cell = self.cells[row, col]
         self.selected_cell.is_Selected = True
+        self.selected_cell.draw()
+        self.first_Selection = False
 
     def click(self, x, y):
-        # col_value = x * ??
-        # col_value = y * ??
-        # select(row_value, col_value)
-        pass
-
+        col_value = int((x -209.5) / 45)
+        row_value = int((y-28) / 45)
+        self.select(row_value, col_value)
 
     def clear(self):
         self.selected_cell.set_cell_value(0)
 
+    def clear_whole_board(self):
+        for cell in self.cells:
+            if self.cells[cell].is_editable:
+                self.cells[cell].set_cell_value(0)
 
     def sketch(self, value):
         self.selected_cell.set_sketched_value(value)
 
-
     def place_number(self, value):
-        self.selected_cell.set_cell_value_value(self.selected_cell.sketched_value)
-
+        self.selected_cell.set_cell_value(1)
 
     def reset_to_original(self, sudoku):
         for cell in self.cells:

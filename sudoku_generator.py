@@ -1,5 +1,6 @@
 import math, random
 import sys, pygame
+from sudoku import Board
 
 
 class SudokuGenerator:
@@ -33,7 +34,6 @@ class SudokuGenerator:
     '''
 
     def get_board(self):
-
         return self.board
 
     def initialize_board(self):
@@ -146,9 +146,18 @@ class SudokuGenerator:
         for i in range(0, 9):
             for j in range(0, 9):
                 if self.board[i][j] != 0:
+                    this_cell = this_board.cells[j, i]
+                    this_cell.value = self.board[i][j]
+                    this_cell.is_editable = False
                     screen.blit(myfont2.render(f'{self.board[i][j]}', True, black), (45*i + 209.5, 45*j + 28))
-
-
+    def print_numbers_2(self):
+        for i in range(0, 9):
+            for j in range(0, 9):
+                this_cell = this_board.cells[j,i]
+                if not this_cell.is_editable:
+                    screen.blit(myfont2.render(f'{self.board[i][j]}', True, black), (45 * i + 209.5, 45 * j + 28))
+                elif not this_cell.value == 0:
+                    screen.blit(myfont2.render(f'{this_cell.value}', True, black), (45*i + 209.5, 45*j + 28))
 
 def generate_sudoku(size, removed):
     global sudoku
@@ -206,7 +215,8 @@ def puzzle_screen():
     pygame.draw.rect(screen, yellow, (358.5, 450, 83, 35))
     screen.blit(button_text2, (363.5, 450))
     pygame.draw.rect(screen, yellow, (545, 450, 65, 35))
-    screen.blit(button_text1, (550, 450))
+    screen.blit(button_text3, (550, 450))
+
 
 size = width, height = 800, 533
 black = 0, 0, 0
@@ -228,15 +238,18 @@ myfont2 = pygame.font.SysFont('Comic Sans', 20)
 intro_screen()
 intro = True
 
+
 def selection_check():
     puzzle_screen()
-    sudoku.print_numbers()
+    sudoku.print_numbers_2()
     if selection:
         pygame.draw.rect(screen, red, pygame.Rect(45 * col + 197.5, 45 * row + 28, 45, 45), 5)
 
 
 # defining this variable outside to make sure is accessible
 selection = False
+# this as a placeholder
+this_board = Board(9, 9, screen, "easy")
 
 while True:
     for event in pygame.event.get():
@@ -246,19 +259,25 @@ while True:
             if 400 <= y <= 435:
                 if 195 <= x <= 248:
                     difficulty = "easy"
+                    this_board = Board(9, 9, screen, difficulty)
                     generate_sudoku(9, 30)
+                    this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
                     intro = False
                 elif 358.5 <= x <= 441.5:
                     difficulty = "medium"
+                    this_board = Board(9, 9, screen, difficulty)
                     generate_sudoku(9, 40)
+                    this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
                     intro = False
                 elif 545 <= x <= 605:
                     difficulty = "hard"
+                    this_board = Board(9, 9, screen, difficulty)
                     generate_sudoku(9, 50)
+                    this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
                     intro = False
@@ -272,8 +291,27 @@ while True:
                             col = i
                         if (45*j + 28) <= y <= (45*(j+1) + 28):
                             row = j
+                this_board.click(x,y)
                 if sudoku.get_board()[col][row] == 0:
                     selection = True
+            elif 450 <= y <= 485:
+                if 195 <= x <= 260:
+                    print("Reset")
+                    selection = False
+                    this_board.clear_whole_board()
+                    selection_check()
+                elif 358 <= x <= 441:
+                    print("Restart")
+                    selection = False
+                    this_board.clear_whole_board()
+                    selection_check()
+                    this_board = Board(9, 9, screen, difficulty)
+                    generate_sudoku(9, 30)
+                    this_board.set_up_cells(sudoku)
+                    puzzle_screen()
+                    sudoku.print_numbers()
+                elif 545 <= x <= 610:
+                    quit()
 
         if selection:
             selection_check()
@@ -281,33 +319,33 @@ while True:
                 if event.key == pygame.K_1:
                     screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
                     print('1')
-                    sudoku.get_board()[col][row] = 1
+                    #sudoku.get_board()[col][row] = 1
+                    this_board.place_number(1)
                 elif event.key == pygame.K_2:
                     screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
                     print('2')
-                    sudoku.get_board()[col][row] = 2
+                    this_board.selected_cell.set_cell_value = 2
                 elif event.key == pygame.K_3:
                     screen.blit(myfont2.render('3', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 3
+                    this_board.selected_cell.set_cell_value = 3
                 elif event.key == pygame.K_4:
                     screen.blit(myfont2.render('4', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 4
+                    this_board.selected_cell.set_cell_value = 4
                 elif event.key == pygame.K_5:
                     screen.blit(myfont2.render('5', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 5
+                    this_board.selected_cell.set_cell_value = 5
                 elif event.key == pygame.K_6:
                     screen.blit(myfont2.render('6', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 6
+                    this_board.selected_cell.set_cell_value = 6
                 elif event.key == pygame.K_7:
                     screen.blit(myfont2.render('7', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 7
+                    this_board.selected_cell.set_cell_value = 7
                 elif event.key == pygame.K_8:
                     screen.blit(myfont2.render('8', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 8
+                    this_board.selected_cell.set_cell_value = 8
                 elif event.key == pygame.K_9:
                     screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    sudoku.get_board()[col][row] = 9
-                selection = False
+                    this_board.selected_cell.set_cell_value = 9
                 selection_check()
                 print(selection)
 
