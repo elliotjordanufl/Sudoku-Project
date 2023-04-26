@@ -77,7 +77,7 @@ class Board:
         self.selected_cell.set_sketched_value(value)
 
     def place_number(self, value):
-        self.selected_cell.set_cell_value(1)
+        self.selected_cell.set_cell_value(value)
 
     def reset_to_original(self, sudoku):
         for cell in self.cells:

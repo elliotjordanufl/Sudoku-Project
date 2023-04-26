@@ -242,14 +242,44 @@ intro = True
 def selection_check():
     puzzle_screen()
     sudoku.print_numbers_2()
+    this_cell_row = this_board.selected_cell.row
+    this_cell_col = this_board.selected_cell.col
     if selection:
-        pygame.draw.rect(screen, red, pygame.Rect(45 * col + 197.5, 45 * row + 28, 45, 45), 5)
+        pygame.draw.rect(screen, red, pygame.Rect(45 * this_cell_row + 197.5, 45 * this_cell_col + 28, 45, 45), 5)
 
 
 # defining this variable outside to make sure is accessible
 selection = False
 # this as a placeholder
 this_board = Board(9, 9, screen, "easy")
+
+def move_selected_cell(move_type):
+    print("Move attempted")
+    selected_cell_key = 0, 0
+    new_cell_key = 0,0
+    # this does not return the value from the dictionary, selected_cell_key defaults to 0,0
+    for key, value in this_board.cells:
+        if value == this_board.selected_cell:
+            selected_cell_key = key
+    if move_type == "up":
+        new_cell_key = selected_cell_key[0]+1, selected_cell_key[0]
+    elif move_type == "down":
+        new_cell_key = selected_cell_key[0]-1, selected_cell_key[0]
+    elif move_type == "right":
+        new_cell_key = selected_cell_key[0], selected_cell_key[0]+1
+    elif move_type == "left":
+        new_cell_key = selected_cell_key[0], selected_cell_key[0]-1
+    if new_cell_key[0] < 0 or new_cell_key[1] < 0:
+        return this_board.selected_cell
+        print("OOB")
+    else:
+        new_cell = this_board.cells[new_cell_key]
+        if new_cell.is_editable:
+            print("cell move went through")
+            return new_cell
+        else:
+            return this_board.selected_cell
+            print("cell not editable")
 
 while True:
     for event in pygame.event.get():
@@ -320,7 +350,7 @@ while True:
                     screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
                     print('1')
                     #sudoku.get_board()[col][row] = 1
-                    this_board.place_number(1)
+                    this_board.sketch(1)
                 elif event.key == pygame.K_2:
                     screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
                     print('2')
@@ -346,6 +376,16 @@ while True:
                 elif event.key == pygame.K_9:
                     screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
                     this_board.selected_cell.set_cell_value = 9
+                elif event.key == pygame.K_RETURN:
+                    pass
+                elif event.key == pygame.K_DOWN:
+                    this_board.selected_cell = move_selected_cell("down")
+                elif event.key == pygame.K_UP:
+                    this_board.selected_cell = move_selected_cell("up")
+                elif event.key == pygame.K_RIGHT:
+                    this_board.selected_cell = move_selected_cell("right")
+                elif event.key == pygame.K_LEFT:
+                    this_board.selected_cell = move_selected_cell("left")
                 selection_check()
                 print(selection)
 
