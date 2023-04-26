@@ -1,13 +1,5 @@
 import math, random
 import sys, pygame
-from sudoku import Cell, Board
-
-
-"""
-This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
-https://www.geeksforgeeks.org/program-sudoku-generator/
-
-"""
 
 
 class SudokuGenerator:
@@ -31,7 +23,7 @@ class SudokuGenerator:
         self.row_length = row_length
         self.removed_cells = removed_cells
         self.box_length = math.sqrt(row_length)
-        # self.board = self.get_board()
+        self.board = self.initialize_board()
 
     '''
 	Returns a 2D python list of numbers which represents the board
@@ -41,6 +33,10 @@ class SudokuGenerator:
     '''
 
     def get_board(self):
+
+        return self.board
+
+    def initialize_board(self):
         # this is a placeholder list of lists
         board = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -53,28 +49,9 @@ class SudokuGenerator:
                  [0, 0, 0, 0, 0, 0, 0, 0, 0]]
         return board
 
-    '''
-	Displays the board to the console
-    This is not strictly required, but it may be useful for debugging purposes
-
-	Parameters: None
-	Return: None
-    '''
-
     def print_board(self):
         for i in range(0, len(self.board)):
             print(self.board[i])
-
-    '''
-	Determines if num is contained in the specified row (horizontal) of the board
-    If num is already in the specified row, return False. Otherwise, return True
-
-	Parameters:
-	row is the index of the row we are checking
-	num is the value we are looking for in the row
-
-	Return: boolean
-    '''
 
     def valid_in_row(self, row, num):
         if num in self.board[row]:
@@ -82,35 +59,11 @@ class SudokuGenerator:
         else:
             return True
 
-    '''
-	Determines if num is contained in the specified column (vertical) of the board
-    If num is already in the specified col, return False. Otherwise, return True
-
-	Parameters:
-	col is the index of the column we are checking
-	num is the value we are looking for in the column
-
-	Return: boolean
-    '''
-
     def valid_in_col(self, col, num):
         for i in range(0, 9):
             if num == self.board[i][int(col)]:
                 return False
         return True
-
-    '''
-	Determines if num is contained in the 3x3 box specified on the board
-    If num is in the specified box starting at (row_start, col_start), return False.
-    Otherwise, return True
-
-	Parameters:
-	row_start and col_start are the starting indices of the box to check
-	i.e. the box is from (row_start, col_start) to (row_start+2, col_start+2)
-	num is the value we are looking for in the box
-
-	Return: boolean
-    '''
 
     def valid_in_box(self, row_start, col_start, num):
         i = row_start
@@ -123,33 +76,11 @@ class SudokuGenerator:
             i += 1
         return True
 
-    '''
-    Determines if it is valid to enter num at (row, col) in the board
-    This is done by checking that num is unused in the appropriate, row, column, and box
-
-	Parameters:
-	row and col are the row index and col index of the cell to check in the board
-	num is the value to test if it is safe to enter in this cell
-
-	Return: boolean
-    '''
-
     def is_valid(self, row, col, num):
         if self.valid_in_row(row, num) and self.valid_in_col(col, num) and self.valid_in_box(row - row % 3, col - col % 3, num):
             return True
         else:
             return False
-
-    '''
-    Fills the specified 3x3 box with values
-    For each position, generates a random digit which has not yet been used in the box
-
-	Parameters:
-	row_start and col_start are the starting indices of the box to check
-	i.e. the box is from (row_start, col_start) to (row_start+2, col_start+2)
-
-	Return: None
-    '''
 
     def fill_box(self, row_start, col_start):
         unused_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -162,31 +93,10 @@ class SudokuGenerator:
                 j += 1
             i += 1
 
-    '''
-    Fills the three boxes along the main diagonal of the board
-    These are the boxes which start at (0,0), (3,3), and (6,6)
-
-	Parameters: None
-	Return: None
-    '''
-
     def fill_diagonal(self):
         self.fill_box(0, 0)
         self.fill_box(3, 3)
         self.fill_box(6, 6)
-
-    '''
-    DO NOT CHANGE
-    Provided for students
-    Fills the remaining cells of the board
-    Should be called after the diagonal boxes have been filled
-
-	Parameters:
-	row, col specify the coordinates of the first empty (0) cell
-
-	Return:
-	boolean (whether or not we could solve the board)
-    '''
 
     def fill_remaining(self, row, col):
 
@@ -219,31 +129,9 @@ class SudokuGenerator:
                 self.board[row][int(col)] = 0
         return False
 
-    '''
-    DO NOT CHANGE
-    Provided for students
-    Constructs a solution by calling fill_diagonal and fill_remaining
-
-	Parameters: None
-	Return: None
-    '''
-
     def fill_values(self):
         self.fill_diagonal()
         self.fill_remaining(0, int(self.box_length))
-
-    '''
-    Removes the appropriate number of cells from the board
-    This is done by setting some values to 0
-    Should be called after the entire solution has been constructed
-    i.e. after fill_values has been called
-
-    NOTE: Be careful not to 'remove' the same cell multiple times
-    i.e. if a cell is already 0, it cannot be removed again
-
-	Parameters: None
-	Return: None
-    '''
 
     def remove_cells(self):
         while self.removed_cells > 0:
@@ -254,26 +142,16 @@ class SudokuGenerator:
                 self.board[rand_col][rand_row] = 0
                 self.removed_cells -= 1
 
+    def print_numbers(self):
+        for i in range(0, 9):
+            for j in range(0, 9):
+                if self.board[i][j] != 0:
+                    screen.blit(myfont2.render(f'{self.board[i][j]}', True, black), (45*i + 209.5, 45*j + 28))
 
-
-'''
-DO NOT CHANGE
-Provided for students
-Given a number of rows and number of cells to remove, this function:
-1. creates a SudokuGenerator
-2. fills its values and saves this as the solved state
-3. removes the appropriate number of cells
-4. returns the representative 2D Python Lists of the board and solution
-
-Parameters:
-size is the number of rows/columns of the board (9 for this project)
-removed is the number of cells to clear (set to 0)
-
-Return: list[list] (a 2D Python list to represent the board)
-'''
 
 
 def generate_sudoku(size, removed):
+    global sudoku
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
     board = sudoku.get_board()
@@ -281,13 +159,160 @@ def generate_sudoku(size, removed):
     board = sudoku.get_board()
     return board
 
-'''
-sudoku = SudokuGenerator(9, 70)
-sudoku.fill_values()
-board = sudoku.get_board()
-sudoku.remove_cells()
-sudoku.print_board()
-'''
-this_sudoku = generate_sudoku(9,70)
-# screen and difficulty
-# this_board = Board(9,9,screen,difficulty)
+pygame.init()
+
+def intro_screen():
+    text = myfont.render('Welcome to Sudoku', True, black)
+    text1 = myfont1.render('Select Game Mode:', True, black)
+    text_option1 = myfont2.render('Easy', True, black)
+    text_option2 = myfont2.render('Medium', True, black)
+    text_option3 = myfont2.render('Hard', True, black)
+
+
+    screen.fill(black)
+    screen.blit(background, (0, 0))
+    screen.blit(text, (123.5, 60))
+    screen.blit(text1, (197.5, 200))
+    pygame.draw.rect(screen, yellow, (195, 400, 53, 35))
+    screen.blit(text_option1, (200, 400))
+    pygame.draw.rect(screen, yellow, (358.5, 400, 83, 35))
+    screen.blit(text_option2, (363.5, 400))
+    pygame.draw.rect(screen, yellow, (545, 400, 60, 35))
+    screen.blit(text_option3, (550, 400))
+
+
+def puzzle_screen():
+    screen.fill(black)
+    screen.blit(background, (0, 0))
+    pygame.draw.rect(screen, yellow, (197.5, 28, 405, 405))
+    pygame.draw.rect(screen, black, (197.5, 28, 405, 405), 5)
+    pygame.draw.rect(screen, black, (332.5, 28, 5, 405))
+    pygame.draw.rect(screen, black, (467.5, 28, 5, 405))
+    pygame.draw.rect(screen, black, (197.5, 163, 405, 5))
+    pygame.draw.rect(screen, black, (197.5, 298, 405, 5))
+    #smaller boundaries
+    for i in range(0, 9):
+        pygame.draw.rect(screen, black, (197.5, 73 + 45*i, 405, 2.5))
+
+    for i in range(0, 9):
+        pygame.draw.rect(screen, black, (242.5 + 45*i, 28, 2.5, 405))
+
+    button_text1 = myfont2.render('Reset', True, black)
+    button_text2 = myfont2.render('Restart', True, black)
+    button_text3 = myfont2.render('Exit', True, black)
+
+    pygame.draw.rect(screen, yellow, (195, 450, 65, 35))
+    screen.blit(button_text1, (200, 450))
+    pygame.draw.rect(screen, yellow, (358.5, 450, 83, 35))
+    screen.blit(button_text2, (363.5, 450))
+    pygame.draw.rect(screen, yellow, (545, 450, 65, 35))
+    screen.blit(button_text1, (550, 450))
+
+size = width, height = 800, 533
+black = 0, 0, 0
+white = 255, 255, 255
+yellow = 250, 221, 2
+red = 255, 0, 0
+gray = 112, 115, 113
+
+
+screen = pygame.display.set_mode(size)
+
+background = pygame.image.load("sudoku-background.jpg")
+
+myfont = pygame.font.SysFont('Comic Sans', 60)
+myfont1 = pygame.font.SysFont('Comic Sans', 45)
+myfont2 = pygame.font.SysFont('Comic Sans', 20)
+
+
+intro_screen()
+intro = True
+
+def selection_check():
+    puzzle_screen()
+    sudoku.print_numbers()
+    if selection:
+        pygame.draw.rect(screen, red, pygame.Rect(45 * col + 197.5, 45 * row + 28, 45, 45), 5)
+
+
+# defining this variable outside to make sure is accessible
+selection = False
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN and intro:
+            x, y = event.pos
+            if 400 <= y <= 435:
+                if 195 <= x <= 248:
+                    difficulty = "easy"
+                    generate_sudoku(9, 30)
+                    puzzle_screen()
+                    sudoku.print_numbers()
+                    intro = False
+                elif 358.5 <= x <= 441.5:
+                    difficulty = "medium"
+                    generate_sudoku(9, 40)
+                    puzzle_screen()
+                    sudoku.print_numbers()
+                    intro = False
+                elif 545 <= x <= 605:
+                    difficulty = "hard"
+                    generate_sudoku(9, 50)
+                    puzzle_screen()
+                    sudoku.print_numbers()
+                    intro = False
+        if event.type == pygame.MOUSEBUTTONDOWN and not intro:
+            x, y = event.pos
+            selection = False
+            if 209.5 <= x <= 614.5 and 28 <= y <= 433:
+                for i in range(0, 9):
+                    for j in range(0, 9):
+                        if (45*i + 209.5) <= x <= (45*(i+1) + 209.5):
+                            col = i
+                        if (45*j + 28) <= y <= (45*(j+1) + 28):
+                            row = j
+                if sudoku.get_board()[col][row] == 0:
+                    selection = True
+
+        if selection:
+            selection_check()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    print('1')
+                    sudoku.get_board()[col][row] = 1
+                elif event.key == pygame.K_2:
+                    screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    print('2')
+                    sudoku.get_board()[col][row] = 2
+                elif event.key == pygame.K_3:
+                    screen.blit(myfont2.render('3', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 3
+                elif event.key == pygame.K_4:
+                    screen.blit(myfont2.render('4', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 4
+                elif event.key == pygame.K_5:
+                    screen.blit(myfont2.render('5', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 5
+                elif event.key == pygame.K_6:
+                    screen.blit(myfont2.render('6', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 6
+                elif event.key == pygame.K_7:
+                    screen.blit(myfont2.render('7', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 7
+                elif event.key == pygame.K_8:
+                    screen.blit(myfont2.render('8', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 8
+                elif event.key == pygame.K_9:
+                    screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
+                    sudoku.get_board()[col][row] = 9
+                selection = False
+                selection_check()
+                print(selection)
+
+
+    pygame.display.flip()
+
+
+
