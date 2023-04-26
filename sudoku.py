@@ -10,20 +10,25 @@ class Cell:
         self.is_editable = True
         self.is_Selected = False
         self.sketched_value = 0
+        self.has_sketched = False
 
     def set_cell_value(self, value):
         self.value = value
+        self.has_sketched = False
+        self.sketched_value = 0
         print(f"Cell value set to {self.value}")
 
     def set_sketched_value(self, value):
         self.sketched_value = value
+        self.has_sketched = True
+        print(f"sketched value set to {self.sketched_value}")
 
     def draw(self):
         # for debugging
         if self.is_Selected:
             print(f"You clicked {self.row, self.col}")
         if self.is_editable:
-            print("Fuck Yeah!!")
+            print("yeah")
 
 class Board:
 

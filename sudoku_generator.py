@@ -158,6 +158,9 @@ class SudokuGenerator:
                     screen.blit(myfont2.render(f'{self.board[i][j]}', True, black), (45 * i + 209.5, 45 * j + 28))
                 elif not this_cell.value == 0:
                     screen.blit(myfont2.render(f'{this_cell.value}', True, black), (45*i + 209.5, 45*j + 28))
+                elif this_cell.has_sketched:
+                    screen.blit(myfont2.render(f'{this_cell.sketched_value}', True, gray),
+                                (45 * i + 209.5, 45 * j + 28))
 
 def generate_sudoku(size, removed):
     global sudoku
@@ -270,16 +273,17 @@ def move_selected_cell(move_type):
     elif move_type == "left":
         new_cell_key = selected_cell_key[0], selected_cell_key[0]-1
     if new_cell_key[0] < 0 or new_cell_key[1] < 0:
-        return this_board.selected_cell
         print("OOB")
+        return this_board.selected_cell
     else:
         new_cell = this_board.cells[new_cell_key]
         if new_cell.is_editable:
             print("cell move went through")
             return new_cell
         else:
-            return this_board.selected_cell
             print("cell not editable")
+            return this_board.selected_cell
+
 
 while True:
     for event in pygame.event.get():
@@ -348,36 +352,33 @@ while True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
                     screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    print('1')
-                    #sudoku.get_board()[col][row] = 1
                     this_board.sketch(1)
                 elif event.key == pygame.K_2:
                     screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    print('2')
-                    this_board.selected_cell.set_cell_value = 2
+                    this_board.sketch(2)
                 elif event.key == pygame.K_3:
                     screen.blit(myfont2.render('3', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 3
+                    this_board.sketch(3)
                 elif event.key == pygame.K_4:
                     screen.blit(myfont2.render('4', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 4
+                    this_board.sketch(4)
                 elif event.key == pygame.K_5:
                     screen.blit(myfont2.render('5', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 5
+                    this_board.sketch(5)
                 elif event.key == pygame.K_6:
                     screen.blit(myfont2.render('6', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 6
+                    this_board.sketch(6)
                 elif event.key == pygame.K_7:
                     screen.blit(myfont2.render('7', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 7
+                    this_board.sketch(7)
                 elif event.key == pygame.K_8:
                     screen.blit(myfont2.render('8', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 8
+                    this_board.sketch(8)
                 elif event.key == pygame.K_9:
                     screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    this_board.selected_cell.set_cell_value = 9
+                    this_board.sketch(9)
                 elif event.key == pygame.K_RETURN:
-                    pass
+                    this_board.place_number(this_board.selected_cell.sketched_value)
                 elif event.key == pygame.K_DOWN:
                     this_board.selected_cell = move_selected_cell("down")
                 elif event.key == pygame.K_UP:
