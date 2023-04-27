@@ -24,12 +24,7 @@ class Cell:
     def draw(self):
         # for debugging
         pass
-        '''
-        if self.is_Selected:
-            print(f"You clicked {self.row, self.col}")
-        if self.is_editable:
-            print("yeah")
-        '''
+
 
 class Board:
 
@@ -42,6 +37,7 @@ class Board:
         self.selected_cell = None
         self.first_Selection = True
 
+    # makes dictionary of cells with coordinates as key
     def set_up_cells(self, generated_sudoku):
         i = 0
         while i < self.width:
@@ -55,6 +51,7 @@ class Board:
         for cell in self.cells:
             cell.draw()
 
+    # selects cell, clears past selection so only one selected at a time
     def select(self, row, col):
         if not self.first_Selection:
             previous_cell = self.selected_cell
@@ -64,6 +61,7 @@ class Board:
         self.selected_cell.draw()
         self.first_Selection = False
 
+    # translates clicking in window to selecting cell coordinates
     def click(self, x, y):
         col_value = int((x -209.5) / 45)
         row_value = int((y-28) / 45)
@@ -72,6 +70,7 @@ class Board:
     def clear(self):
         self.selected_cell.set_cell_value(0)
 
+    # sets all editable cells back to 0
     def clear_whole_board(self):
         for cell in self.cells:
             if self.cells[cell].is_editable:
@@ -88,6 +87,7 @@ class Board:
             cell.set_cell_value = sudoku[cell.row][cell.col]
             # row and col might have to be reversed ^^^^
 
+    # checks if board is full
     def is_full(self):
         num_empty_cells = 0
         for cell in self.cells:
@@ -98,6 +98,7 @@ class Board:
         else:
             return False
 
+    # sets sudoku equal to cell values
     def update_board(self, sudoku):
         cell_key_list = self.cells.keys()
         for cell_key in cell_key_list:
@@ -105,6 +106,7 @@ class Board:
             sudoku_board = sudoku.get_board()
             sudoku_board[this_cell.row][this_cell.col] = this_cell.value
 
+    # sees if there are any empty cells
     def find_empty(self):
         empty_cells = []
         cell_list = self.cells.values()
@@ -116,6 +118,7 @@ class Board:
         else:
             return False
 
+    # checks if empty, then updates board
     def check_board(self, sudoku):
         if self.find_empty():
             self.update_board(sudoku)
@@ -125,9 +128,3 @@ class Board:
         return res
 
 
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()

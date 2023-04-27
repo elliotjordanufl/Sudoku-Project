@@ -2,6 +2,7 @@ import math, random
 import sys, pygame
 from sudoku import Board
 
+pygame.init()
 
 class SudokuGenerator:
     '''
@@ -135,6 +136,7 @@ class SudokuGenerator:
         self.fill_remaining(0, int(self.box_length))
 
     def remove_cells(self):
+        # removes cells to set up puzzle
         while self.removed_cells > 0:
             rand_col = random.randint(0, self.row_length-1)
             rand_row = random.randint(0, self.row_length-1)
@@ -144,6 +146,7 @@ class SudokuGenerator:
                 self.removed_cells -= 1
 
     def print_numbers(self):
+        # only to be called when setting up puzzle, not during solving
         for i in range(0, 9):
             for j in range(0, 9):
                 if self.board[i][j] != 0:
@@ -152,6 +155,7 @@ class SudokuGenerator:
                     this_cell.is_editable = False
                     screen.blit(myfont2.render(f'{self.board[i][j]}', True, black), (45*i + 209.5, 45*j + 28))
     def print_numbers_2(self):
+        # a version of print numbers that doens't make them all editable, and includes sketches
         for i in range(0, 9):
             for j in range(0, 9):
                 this_cell = this_board.cells[j,i]
@@ -163,6 +167,7 @@ class SudokuGenerator:
                     screen.blit(myfont2.render(f'{this_cell.sketched_value}', True, gray),(45 * i + 209.5, 45 * j + 28))
 
 def generate_sudoku(size, removed):
+    # makes the sudoku and solution
     global sudoku
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
@@ -171,7 +176,7 @@ def generate_sudoku(size, removed):
     board = sudoku.get_board()
     return board
 
-pygame.init()
+
 
 def intro_screen():
     text = myfont.render('Welcome to Sudoku', True, black)
@@ -180,7 +185,7 @@ def intro_screen():
     text_option2 = myfont2.render('Medium', True, black)
     text_option3 = myfont2.render('Hard', True, black)
 
-
+    # intro screen
     screen.fill(black)
     screen.blit(background, (0, 0))
     screen.blit(text, (123.5, 60))
@@ -194,6 +199,7 @@ def intro_screen():
 
 
 def puzzle_screen():
+    # draws screen for puzzle
     screen.fill(black)
     screen.blit(background, (0, 0))
     pygame.draw.rect(screen, yellow, (197.5, 28, 405, 405))
@@ -220,46 +226,74 @@ def puzzle_screen():
     pygame.draw.rect(screen, yellow, (545, 450, 65, 35))
     screen.blit(button_text3, (550, 450))
 
-
+# initializing variables
+selection = False
+lose = False
+win = False
 size = width, height = 800, 533
 black = 0, 0, 0
 white = 255, 255, 255
 yellow = 250, 221, 2
 red = 255, 0, 0
 gray = 112, 115, 113
-
-
 screen = pygame.display.set_mode(size)
-
 background = pygame.image.load("sudoku-background.jpg")
-
 myfont = pygame.font.SysFont('Comic Sans', 60)
 myfont1 = pygame.font.SysFont('Comic Sans', 45)
 myfont2 = pygame.font.SysFont('Comic Sans', 20)
-
-
 intro_screen()
 intro = True
 
-
 def check_if_completed():
+    # checks if puzzle is complete / correct
     is_complete = False
     is_correct = False
     if this_board.check_board(sudoku):
         is_complete = True
+        # checks each cell to see if puzzle is solved
         cell_key_list = this_board.cells.keys()
         num_correct = 0
         for cell_key in cell_key_list:
             this_cell = this_board.cells[cell_key]
-            if sudoku.is_valid(this_cell.row, this_cell.col, this_cell.value):
+            valid_in_row = True
+            num_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            i = 0
+            while i < 9:
+                if this_board.cells[this_cell.row, i].value in num_list:
+                    num_list.remove(this_board.cells[this_cell.row, i].value)
+                else:
+                    valid_in_row = False
+                i += 1
+            valid_in_col = True
+            num_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            i = 0
+            while i < 9:
+                if this_board.cells[i, this_cell.col].value in num_list:
+                    num_list.remove(this_board.cells[i, this_cell.col].value)
+                else:
+                    valid_in_col = False
+                i += 1
+            valid_in_box = True
+            num_list = [1,2,3,4,5,6,7,8,9]
+            i = this_cell.row - this_cell.row % 3
+            while i <= this_cell.row - this_cell.row % 3 + 2:
+                j = this_cell.col - this_cell.col % 3
+                while j <= this_cell.col - this_cell.col % 3 + 2:
+                    if this_board.cells[i,j].value in num_list:
+                        num_list.remove(this_board.cells[i,j].value)
+                    else:
+                        valid_in_box = False
+                    j += 1
+                i +=1
+            if valid_in_col and valid_in_row and valid_in_box:
                 num_correct += 1
         if num_correct == 81:
             is_correct = True
     return is_complete, is_correct
 
-lose = False
-win = False
+
 def do_game_win():
+    # makes screen when win
     screen.fill(black)
     screen.blit(background, (0, 0))
     button_text1 = myfont2.render('Exit', True, black)
@@ -269,6 +303,7 @@ def do_game_win():
     screen.blit(display_text1, (230, 150))
 
 def do_game_lose():
+    # makes screen when lose
     screen.fill(black)
     screen.blit(background, (0, 0))
     button_text1 = myfont2.render('Reset', True, black)
@@ -278,25 +313,26 @@ def do_game_lose():
     screen.blit(display_text1, (230, 150))
 
 def selection_check():
+    # re-draws screen when user clicks or presses button
     puzzle_screen()
     sudoku.print_numbers_2()
+    # gets coordinates for selection box
     try:
         this_cell_row = this_board.selected_cell.row
         this_cell_col = this_board.selected_cell.col
     except:
         this_cell_row = 1
         this_cell_col = 1
+    # draws selection box
     if selection:
         pygame.draw.rect(screen, red, pygame.Rect(45 * this_cell_row + 197.5, 45 * this_cell_col + 28, 45, 45), 5)
 
 
-# defining this variable outside to make sure is accessible
-selection = False
-# this as a placeholder
-this_board = Board(9, 9, screen, "easy")
+
+
 
 def move_selected_cell(move_type):
-
+    # initializing
     selected_cell_key = 0, 0
     new_cell_key = 0, 0
 
@@ -305,7 +341,7 @@ def move_selected_cell(move_type):
     for key in all_keys_list:
         if this_board.cells[key] == this_board.selected_cell:
             selected_cell_key = key
-
+    # changes the key to change the selected cell
     if move_type == "up":
         new_cell_key = selected_cell_key[0]-1, selected_cell_key[1]
     elif move_type == "down":
@@ -328,6 +364,7 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN and intro:
             x, y = event.pos
             if 400 <= y <= 435:
+                # chosing difficulty / starting game
                 if 195 <= x <= 248:
                     difficulty = "easy"
                     this_board = Board(9, 9, screen, difficulty)
@@ -353,6 +390,7 @@ while True:
                     sudoku.print_numbers()
                     intro = False
         if event.type == pygame.MOUSEBUTTONDOWN and lose:
+            # reset button when lose
             x, y = event.pos
             if 345 <= x <= 410 and 450 <= y <= 485:
                 selection = False
@@ -366,11 +404,13 @@ while True:
                 lose = False
 
         if event.type == pygame.MOUSEBUTTONDOWN and win:
+            # exit button when win
             x, y = event.pos
             if 345 <= x <= 410 and 450 <= y <= 485:
                 quit()
 
         if event.type == pygame.MOUSEBUTTONDOWN and not intro and not lose and not win:
+            # clicking cells
             x, y = event.pos
             selection = False
             if 209.5 <= x <= 614.5 and 28 <= y <= 433:
@@ -383,13 +423,13 @@ while True:
                 this_board.click(x,y)
                 selection = True
             elif 450 <= y <= 485:
+                # reset button
                 if 195 <= x <= 260:
-                    print("Reset")
                     selection = False
                     this_board.clear_whole_board()
                     selection_check()
+                # restart button
                 elif 358 <= x <= 441:
-                    print("Restart")
                     selection = False
                     this_board.clear_whole_board()
                     selection_check()
@@ -398,12 +438,14 @@ while True:
                     this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
+                # quit button
                 elif 545 <= x <= 610:
                     quit()
 
         if selection:
             selection_check()
             if event.type == pygame.KEYDOWN:
+                # enters number pressed as sketch
                 if event.key == pygame.K_1:
                     screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
                     if this_board.selected_cell.is_editable:
@@ -440,8 +482,10 @@ while True:
                     screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
                     if this_board.selected_cell.is_editable:
                         this_board.sketch(9)
+                # submits sketch as number to enter
                 elif event.key == pygame.K_RETURN:
                     this_board.place_number(this_board.selected_cell.sketched_value)
+                # moves the selection with arrow keys
                 elif event.key == pygame.K_DOWN:
                     this_board.selected_cell = move_selected_cell("down")
                 elif event.key == pygame.K_UP:
@@ -451,9 +495,9 @@ while True:
                 elif event.key == pygame.K_LEFT:
                     this_board.selected_cell = move_selected_cell("left")
                 selection_check()
+            # checks if puzzle solved correctly, or if filled incorrectly
             if not intro:
                 check_result = check_if_completed()
-                print(f'complete: {check_result[0]}, correct: {check_result[1]}')
                 if check_result[1] and check_result[0]:
                     win = True
                     do_game_win()
@@ -465,3 +509,9 @@ while True:
 
 
 
+def main():
+    pass
+
+
+if __name__ == "__main__":
+    main()
