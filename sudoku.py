@@ -16,19 +16,20 @@ class Cell:
         self.value = value
         self.has_sketched = False
         self.sketched_value = 0
-        print(f"Cell value set to {self.value}")
 
     def set_sketched_value(self, value):
         self.sketched_value = value
         self.has_sketched = True
-        print(f"sketched value set to {self.sketched_value}")
 
     def draw(self):
         # for debugging
+        pass
+        '''
         if self.is_Selected:
             print(f"You clicked {self.row, self.col}")
         if self.is_editable:
             print("yeah")
+        '''
 
 class Board:
 
@@ -47,8 +48,6 @@ class Board:
             j = 0
             while j < self.height:
                 self.cells[i, j] = Cell(generated_sudoku.board[j][i], j, i, self.screen)
-                # i do not know why this is an error / warning?
-                # i want to get it so that the tuple key for this dictionary is the same as the cell's row and col
                 j +=1
             i += 1
 
@@ -99,20 +98,31 @@ class Board:
         else:
             return False
 
-    def update_board(self):
-        # I do not understand what this is or why we need it
-        pass
+    def update_board(self, sudoku):
+        cell_key_list = self.cells.keys()
+        for cell_key in cell_key_list:
+            this_cell = self.cells[cell_key]
+            sudoku_board = sudoku.get_board()
+            sudoku_board[this_cell.row][this_cell.col] = this_cell.value
 
     def find_empty(self):
         empty_cells = []
-        for cell in self.cells:
+        cell_list = self.cells.values()
+        for cell in cell_list:
             if cell.value == 0:
                 empty_cells.append(cell)
-        return empty_cells[random.randint(0, len(empty_cells)-1)]
+        if len(empty_cells) == 0:
+            return True
+        else:
+            return False
 
-    def check_board(self):
-        # I don't get this either
-        pass
+    def check_board(self, sudoku):
+        if self.find_empty():
+            self.update_board(sudoku)
+            res = True
+        else:
+            res = False
+        return res
 
 
 def main():
