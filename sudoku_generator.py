@@ -1,7 +1,8 @@
 import math, random
-import sys, pygame
+import sys
+import sudoku
 from sudoku import Board
-
+import pygame
 pygame.init()
 
 class SudokuGenerator:
@@ -227,9 +228,6 @@ def puzzle_screen():
     screen.blit(button_text3, (550, 450))
 
 # initializing variables
-selection = False
-lose = False
-win = False
 size = width, height = 800, 533
 black = 0, 0, 0
 white = 255, 255, 255
@@ -242,7 +240,7 @@ myfont = pygame.font.SysFont('Comic Sans', 60)
 myfont1 = pygame.font.SysFont('Comic Sans', 45)
 myfont2 = pygame.font.SysFont('Comic Sans', 20)
 intro_screen()
-intro = True
+
 
 def check_if_completed():
     # checks if puzzle is complete / correct
@@ -357,79 +355,51 @@ def move_selected_cell(move_type):
         return new_cell
 
 
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN and intro:
-            x, y = event.pos
-            if 400 <= y <= 435:
-                # chosing difficulty / starting game
-                if 195 <= x <= 248:
-                    difficulty = "easy"
-                    this_board = Board(9, 9, screen, difficulty)
-                    generate_sudoku(9, 30)
-                    this_board.set_up_cells(sudoku)
-                    puzzle_screen()
-                    sudoku.print_numbers()
-                    intro = False
-                elif 358.5 <= x <= 441.5:
-                    difficulty = "medium"
-                    this_board = Board(9, 9, screen, difficulty)
-                    generate_sudoku(9, 40)
-                    this_board.set_up_cells(sudoku)
-                    puzzle_screen()
-                    sudoku.print_numbers()
-                    intro = False
-                elif 545 <= x <= 605:
-                    difficulty = "hard"
-                    this_board = Board(9, 9, screen, difficulty)
-                    generate_sudoku(9, 50)
-                    this_board.set_up_cells(sudoku)
-                    puzzle_screen()
-                    sudoku.print_numbers()
-                    intro = False
-        if event.type == pygame.MOUSEBUTTONDOWN and lose:
-            # reset button when lose
-            x, y = event.pos
-            if 345 <= x <= 410 and 450 <= y <= 485:
-                selection = False
-                this_board.clear_whole_board()
-                selection_check()
-                this_board = Board(9, 9, screen, difficulty)
-                generate_sudoku(9, 30)
-                this_board.set_up_cells(sudoku)
-                puzzle_screen()
-                sudoku.print_numbers()
-                lose = False
-
-        if event.type == pygame.MOUSEBUTTONDOWN and win:
-            # exit button when win
-            x, y = event.pos
-            if 345 <= x <= 410 and 450 <= y <= 485:
-                quit()
-
-        if event.type == pygame.MOUSEBUTTONDOWN and not intro and not lose and not win:
-            # clicking cells
-            x, y = event.pos
-            selection = False
-            if 209.5 <= x <= 614.5 and 28 <= y <= 433:
-                for i in range(0, 9):
-                    for j in range(0, 9):
-                        if (45*i + 209.5) <= x <= (45*(i+1) + 209.5):
-                            col = i
-                        if (45*j + 28) <= y <= (45*(j+1) + 28):
-                            row = j
-                this_board.click(x,y)
-                selection = True
-            elif 450 <= y <= 485:
-                # reset button
-                if 195 <= x <= 260:
-                    selection = False
-                    this_board.clear_whole_board()
-                    selection_check()
-                # restart button
-                elif 358 <= x <= 441:
+def sudoku():
+    global lose
+    global win
+    lose = False
+    win = False
+    global selection
+    selection = False
+    global intro
+    intro = True
+    global this_board
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and intro:
+                x, y = event.pos
+                if 400 <= y <= 435:
+                    # chosing difficulty / starting game
+                    if 195 <= x <= 248:
+                        difficulty = "easy"
+                        this_board = Board(9, 9, screen, difficulty)
+                        generate_sudoku(9, 30)
+                        this_board.set_up_cells(sudoku)
+                        puzzle_screen()
+                        sudoku.print_numbers()
+                        intro = False
+                    elif 358.5 <= x <= 441.5:
+                        difficulty = "medium"
+                        this_board = Board(9, 9, screen, difficulty)
+                        generate_sudoku(9, 40)
+                        this_board.set_up_cells(sudoku)
+                        puzzle_screen()
+                        sudoku.print_numbers()
+                        intro = False
+                    elif 545 <= x <= 605:
+                        difficulty = "hard"
+                        this_board = Board(9, 9, screen, difficulty)
+                        generate_sudoku(9, 50)
+                        this_board.set_up_cells(sudoku)
+                        puzzle_screen()
+                        sudoku.print_numbers()
+                        intro = False
+            if event.type == pygame.MOUSEBUTTONDOWN and lose:
+                # reset button when lose
+                x, y = event.pos
+                if 345 <= x <= 410 and 450 <= y <= 485:
                     selection = False
                     this_board.clear_whole_board()
                     selection_check()
@@ -438,80 +408,111 @@ while True:
                     this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
-                # quit button
-                elif 545 <= x <= 610:
+                    lose = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and win:
+                # exit button when win
+                x, y = event.pos
+                if 345 <= x <= 410 and 450 <= y <= 485:
                     quit()
 
-        if selection:
-            selection_check()
-            if event.type == pygame.KEYDOWN:
-                # enters number pressed as sketch
-                if event.key == pygame.K_1:
-                    screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(1)
-                elif event.key == pygame.K_2:
-                    screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(2)
-                elif event.key == pygame.K_3:
-                    screen.blit(myfont2.render('3', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(3)
-                elif event.key == pygame.K_4:
-                    screen.blit(myfont2.render('4', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(4)
-                elif event.key == pygame.K_5:
-                    screen.blit(myfont2.render('5', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(5)
-                elif event.key == pygame.K_6:
-                    screen.blit(myfont2.render('6', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(6)
-                elif event.key == pygame.K_7:
-                    screen.blit(myfont2.render('7', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(7)
-                elif event.key == pygame.K_8:
-                    screen.blit(myfont2.render('8', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(8)
-                elif event.key == pygame.K_9:
-                    screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
-                    if this_board.selected_cell.is_editable:
-                        this_board.sketch(9)
-                # submits sketch as number to enter
-                elif event.key == pygame.K_RETURN:
-                    this_board.place_number(this_board.selected_cell.sketched_value)
-                # moves the selection with arrow keys
-                elif event.key == pygame.K_DOWN:
-                    this_board.selected_cell = move_selected_cell("down")
-                elif event.key == pygame.K_UP:
-                    this_board.selected_cell = move_selected_cell("up")
-                elif event.key == pygame.K_RIGHT:
-                    this_board.selected_cell = move_selected_cell("right")
-                elif event.key == pygame.K_LEFT:
-                    this_board.selected_cell = move_selected_cell("left")
+            if event.type == pygame.MOUSEBUTTONDOWN and not intro and not lose and not win:
+                # clicking cells
+                x, y = event.pos
+                selection = False
+                if 209.5 <= x <= 614.5 and 28 <= y <= 433:
+                    for i in range(0, 9):
+                        for j in range(0, 9):
+                            if (45*i + 209.5) <= x <= (45*(i+1) + 209.5):
+                                col = i
+                            if (45*j + 28) <= y <= (45*(j+1) + 28):
+                                row = j
+                    this_board.click(x,y)
+                    selection = True
+                elif 450 <= y <= 485:
+                    # reset button
+                    if 195 <= x <= 260:
+                        selection = False
+                        this_board.clear_whole_board()
+                        selection_check()
+                    # restart button
+                    elif 358 <= x <= 441:
+                        selection = False
+                        this_board.clear_whole_board()
+                        selection_check()
+                        this_board = Board(9, 9, screen, difficulty)
+                        generate_sudoku(9, 30)
+                        this_board.set_up_cells(sudoku)
+                        puzzle_screen()
+                        sudoku.print_numbers()
+                    # quit button
+                    elif 545 <= x <= 610:
+                        quit()
+
+            if selection:
                 selection_check()
-            # checks if puzzle solved correctly, or if filled incorrectly
-            if not intro:
-                check_result = check_if_completed()
-                if check_result[1] and check_result[0]:
-                    win = True
-                    do_game_win()
-                elif check_result[0] and not check_result[1]:
-                    lose = True
-                    do_game_lose()
+                if event.type == pygame.KEYDOWN:
+                    # enters number pressed as sketch
+                    if event.key == pygame.K_1:
+                        screen.blit(myfont2.render('1', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(1)
+                    elif event.key == pygame.K_2:
+                        screen.blit(myfont2.render('2', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(2)
+                    elif event.key == pygame.K_3:
+                        screen.blit(myfont2.render('3', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(3)
+                    elif event.key == pygame.K_4:
+                        screen.blit(myfont2.render('4', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(4)
+                    elif event.key == pygame.K_5:
+                        screen.blit(myfont2.render('5', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(5)
+                    elif event.key == pygame.K_6:
+                        screen.blit(myfont2.render('6', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(6)
+                    elif event.key == pygame.K_7:
+                        screen.blit(myfont2.render('7', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(7)
+                    elif event.key == pygame.K_8:
+                        screen.blit(myfont2.render('8', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(8)
+                    elif event.key == pygame.K_9:
+                        screen.blit(myfont2.render('9', True, gray), (45 * col + 197.5, 45 * row + 28))
+                        if this_board.selected_cell.is_editable:
+                            this_board.sketch(9)
+                    # submits sketch as number to enter
+                    elif event.key == pygame.K_RETURN:
+                        this_board.place_number(this_board.selected_cell.sketched_value)
+                    # moves the selection with arrow keys
+                    elif event.key == pygame.K_DOWN:
+                        this_board.selected_cell = move_selected_cell("down")
+                    elif event.key == pygame.K_UP:
+                        this_board.selected_cell = move_selected_cell("up")
+                    elif event.key == pygame.K_RIGHT:
+                        this_board.selected_cell = move_selected_cell("right")
+                    elif event.key == pygame.K_LEFT:
+                        this_board.selected_cell = move_selected_cell("left")
+                    selection_check()
+                # checks if puzzle solved correctly, or if filled incorrectly
+                if not intro:
+                    check_result = check_if_completed()
+                    if check_result[1] and check_result[0]:
+                        win = True
+                        do_game_win()
+                    elif check_result[0] and not check_result[1]:
+                        lose = True
+                        do_game_lose()
 
-    pygame.display.flip()
-
-
-
-def main():
-    pass
-
+        pygame.display.flip()
 
 if __name__ == "__main__":
-    main()
+    sudoku()
