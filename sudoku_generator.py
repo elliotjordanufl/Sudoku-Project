@@ -331,7 +331,7 @@ while True:
                 if 195 <= x <= 248:
                     difficulty = "easy"
                     this_board = Board(9, 9, screen, difficulty)
-                    generate_sudoku(9, 2)
+                    generate_sudoku(9, 30)
                     this_board.set_up_cells(sudoku)
                     puzzle_screen()
                     sudoku.print_numbers()
